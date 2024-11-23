@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Rainhas</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .content {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 30px;
+        }
+        .board-container {
+            position: relative;
+            display: grid;
+            grid-template-columns: 30px 400px;
+            grid-template-rows: 400px 30px;
+            gap: 0;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: 400px;
+            height: 400px;
+            background-image: url('/static/tabuleiro/tabuleiro.png');
+            background-size: cover;
+            position: relative;
+        }
+        .labels-left {
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            padding-right: 5px;
+        }
+        .labels-bottom {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .queen {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-image: url('/static/tabuleiro/queen.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .solution-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .solution-table {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        async function iniciarBusca() {
+            const response = await fetch('/iniciar-busca/');
+            const data = await response.json();
+            atualizarTabuleiro(data.solution);
+            exibirSolucao(data.solution);
+        }
+
+        async function proximaSolucao() {
+            const response = await fetch('/proxima-solucao/');
+            const data = await response.json();
+            atualizarTabuleiro(data.solution);
+            exibirSolucao(data.solution);
+        }
+// Função para atualizar o tabuleiro com a solução atual
+    function atualizarTabuleiro(solution) {
+        const board = document.getElementById('board');
+        board.innerHTML = ''; // Limpa o tabuleiro
+
+        // Atualiza as posições das rainhas no tabuleiro
+        for (let row = 0; row < solution.length; row++) {
+            const col = solution[row]; // Coluna da rainha para a linha atual
+            const queen = document.createElement('div');
+            queen.className = 'queen';
+
+            // Inverte as linhas para exibição de baixo para cima
+            const visualRow = row
+            queen.style.bottom = `${col * 50}px`; // Posição vertical
+            queen.style.left = `${visualRow * 50}px`; // Posição horizontal (coluna correta)
+
+            board.appendChild(queen);
+        }
+    }
+
+    // Função para exibir a solução na tabela
+    function exibirSolucao(solution) {
+        const solutionTable = document.getElementById('solution-table');
+        solutionTable.innerHTML = '';
+
+        // Cabeçalho (colunas A a H)
+        const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        columns.forEach(col => {
+            const cell = document.createElement('div');
+            cell.textContent = col;
+            cell.style.fontWeight = 'bold';
+            solutionTable.appendChild(cell);
+        });
+
+        // Solução (exibição das colunas de cada linha)
+        solution.forEach(num => {
+            const cell = document.createElement('div');
+            cell.textContent = num + 1; // Converte índice 0-7 para exibição 1-8
+            solutionTable.appendChild(cell);
+        });
+    }
+    </script>
+</head>
+<body>
+    <h1 style="text-align: center;">Problema das 8 Rainhas</h1>
+    <div class="container">
+        <div class="content">
+            <!-- Tabuleiro e rótulos -->
+            <div class="board-container">
+                <!-- Rótulos das linhas à esquerda -->
+                <div class="labels-left">
+                    <div>1</div>
+                    <div>2</div>
+                    <div>3</div>
+                    <div>4</div>
+                    <div>5</div>
+                    <div>6</div>
+                    <div>7</div>
+                    <div>8</div>
+                </div>
+                <!-- Tabuleiro -->
+                <div id="board" class="board"></div>
+                <!-- Rótulos das colunas abaixo -->
+                <div></div>
+                <div class="labels-bottom">
+                    <div>A</div>
+                    <div>B</div>
+                    <div>C</div>
+                    <div>D</div>
+                    <div>E</div>
+                    <div>F</div>
+                    <div>G</div>
+                    <div>H</div>
+                </div>
+            </div>
+
+            <!-- Solução atual -->
+            <div class="solution-container">
+                <div>Solução Atual:</div>
+                <div id="solution-table" class="solution-table">
+                    <!-- Conteúdo será inserido dinamicamente -->
+                </div>
+            </div>
+        </div>
+        <button onclick="iniciarBusca()">Iniciar Busca</button>
+        <button onclick="proximaSolucao()">Próxima Solução</button>
+    </div>
+</body>
+</html>
