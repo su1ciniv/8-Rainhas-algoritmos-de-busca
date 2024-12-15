@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>8 Rainhas</title>
+    <title>Problema das 8 Rainhas</title>
     <style>
         .container {
             display: flex;
@@ -82,80 +82,71 @@
     </style>
     <script>
         async function iniciarBusca() {
-            const algorithm = document.getElementById('algorithm').value;  // Pega o algoritmo selecionado
-            const response = await fetch(`/iniciar-busca/?algoritmo=${algorithm}`);  // Envia a requisição com o parâmetro correto
-            const data = await response.json();
-        
-            atualizarTabuleiro(data.solution);
-            exibirSolucao(data.solution);
-        
-            // Exibe o tempo de execução
-            alert(`Tempo de execução: ${data.time.toFixed(3)} segundos`);
+            const algoritmo = document.getElementById('algoritmo').value;  // Obtém o algoritmo selecionado
+            const resposta = await fetch(`/iniciar-busca/?algoritmo=${algoritmo}`);  // Envia a requisição para o back-end
+            const dados = await resposta.json();
+
+            atualizarTabuleiro(dados.solucao);
+            exibirSolucao(dados.solucao);
+
+            // Exibe o tempo de execução em um alerta
+            alert(`Tempo de execução: ${dados.tempo.toFixed(3)} segundos`);
         }
-        
 
         async function proximaSolucao() {
-            const response = await fetch('/proxima-solucao/');
-            const data = await response.json();
-            atualizarTabuleiro(data.solution);
-            exibirSolucao(data.solution);
+            const resposta = await fetch('/proxima-solucao/');
+            const dados = await resposta.json();
+            atualizarTabuleiro(dados.solucao);
+            exibirSolucao(dados.solucao);
         }
 
-        // Função para atualizar o tabuleiro com a solução atual
-        function atualizarTabuleiro(solution) {
-            const board = document.getElementById('board');
-            board.innerHTML = ''; // Limpa o tabuleiro
+        function atualizarTabuleiro(solucao) {
+            const tabuleiro = document.getElementById('tabuleiro');
+            tabuleiro.innerHTML = ''; // Limpa o tabuleiro
 
-            // Atualiza as posições das rainhas no tabuleiro
-            for (let row = 0; row < solution.length; row++) {
-                const col = solution[row]; // Coluna da rainha para a linha atual
-                const queen = document.createElement('div');
-                queen.className = 'queen';
+            for (let linha = 0; linha < solucao.length; linha++) {
+                const coluna = solucao[linha];
+                const rainha = document.createElement('div');
+                rainha.className = 'queen';
 
-                // Inverte as linhas para exibição de baixo para cima
-                const visualRow = row;
-                queen.style.bottom = `${col * 50}px`; // Posição vertical
-                queen.style.left = `${visualRow * 50}px`; // Posição horizontal (coluna correta)
+                // Ajusta a posição das rainhas no tabuleiro
+                rainha.style.bottom = `${coluna * 50}px`;
+                rainha.style.left = `${linha * 50}px`;
 
-                board.appendChild(queen);
+                tabuleiro.appendChild(rainha);
             }
         }
 
-        // Função para exibir a solução na tabela
-        function exibirSolucao(solution) {
-            const solutionTable = document.getElementById('solution-table');
-            solutionTable.innerHTML = '';
+        function exibirSolucao(solucao) {
+            const tabelaSolucao = document.getElementById('tabela-solucao');
+            tabelaSolucao.innerHTML = '';
 
-            // Cabeçalho (colunas A a H)
-            const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-            columns.forEach(col => {
-                const cell = document.createElement('div');
-                cell.textContent = col;
-                cell.style.fontWeight = 'bold';
-                solutionTable.appendChild(cell);
+            const colunas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            colunas.forEach(coluna => {
+                const celula = document.createElement('div');
+                celula.textContent = coluna;
+                celula.style.fontWeight = 'bold';
+                tabelaSolucao.appendChild(celula);
             });
 
-            // Solução (exibição das colunas de cada linha)
-            solution.forEach(num => {
-                const cell = document.createElement('div');
-                cell.textContent = num + 1; // Converte índice 0-7 para exibição 1-8
-                solutionTable.appendChild(cell);
+            solucao.forEach(numero => {
+                const celula = document.createElement('div');
+                celula.textContent = numero + 1;  // Ajusta para exibição 1-8
+                tabelaSolucao.appendChild(celula);
             });
         }
     </script>
 </head>
 <body>
     <h1 style="text-align: center;">Problema das 8 Rainhas</h1>
-    <label for="algorithm">Algoritmo:</label>
-    <select id="algorithm">
+    <label for="algoritmo">Escolha o algoritmo:</label>
+    <select id="algoritmo">
         <option value="dfs">Busca em Profundidade (DFS)</option>
         <option value="hill_climbing">Subida de Encosta (Hill Climbing)</option>
     </select>
     <div class="container">
         <div class="content">
-            <!-- Tabuleiro e rótulos -->
             <div class="board-container">
-                <!-- Rótulos das linhas à esquerda -->
                 <div class="labels-left">
                     <div>1</div>
                     <div>2</div>
@@ -166,9 +157,7 @@
                     <div>7</div>
                     <div>8</div>
                 </div>
-                <!-- Tabuleiro -->
-                <div id="board" class="board"></div>
-                <!-- Rótulos das colunas abaixo -->
+                <div id="tabuleiro" class="board"></div>
                 <div></div>
                 <div class="labels-bottom">
                     <div>A</div>
@@ -182,11 +171,10 @@
                 </div>
             </div>
 
-            <!-- Solução atual -->
             <div class="solution-container">
                 <div>Solução Atual:</div>
-                <div id="solution-table" class="solution-table">
-                    <!-- Conteúdo será inserido dinamicamente -->
+                <div id="tabela-solucao" class="solution-table">
+                    <!-- Conteúdo gerado dinamicamente -->
                 </div>
             </div>
         </div>
