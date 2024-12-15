@@ -1,7 +1,3 @@
-Aqui está um exemplo de `README.md` para o projeto **8-Rainhas-algoritmos-de-busca**.
-
----
-
 # **8 Rainhas - Algoritmos de Busca**
 
 Este projeto implementa o **problema das 8 Rainhas**, utilizando algoritmos de busca como **Busca em Profundidade (DFS)** e **Subida de Encosta** em uma aplicação **Django**. A interface permite visualizar o tabuleiro e navegar entre as soluções geradas.
