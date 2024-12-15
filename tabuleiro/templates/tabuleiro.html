@@ -82,11 +82,17 @@
     </style>
     <script>
         async function iniciarBusca() {
-            const response = await fetch('/iniciar-busca/');
+            const algorithm = document.getElementById('algorithm').value;  // Pega o algoritmo selecionado
+            const response = await fetch(`/iniciar-busca/?algoritmo=${algorithm}`);  // Envia a requisição com o parâmetro correto
             const data = await response.json();
+        
             atualizarTabuleiro(data.solution);
             exibirSolucao(data.solution);
+        
+            // Exibe o tempo de execução
+            alert(`Tempo de execução: ${data.time.toFixed(3)} segundos`);
         }
+        
 
         async function proximaSolucao() {
             const response = await fetch('/proxima-solucao/');
@@ -94,51 +100,57 @@
             atualizarTabuleiro(data.solution);
             exibirSolucao(data.solution);
         }
-// Função para atualizar o tabuleiro com a solução atual
-    function atualizarTabuleiro(solution) {
-        const board = document.getElementById('board');
-        board.innerHTML = ''; // Limpa o tabuleiro
 
-        // Atualiza as posições das rainhas no tabuleiro
-        for (let row = 0; row < solution.length; row++) {
-            const col = solution[row]; // Coluna da rainha para a linha atual
-            const queen = document.createElement('div');
-            queen.className = 'queen';
+        // Função para atualizar o tabuleiro com a solução atual
+        function atualizarTabuleiro(solution) {
+            const board = document.getElementById('board');
+            board.innerHTML = ''; // Limpa o tabuleiro
 
-            // Inverte as linhas para exibição de baixo para cima
-            const visualRow = row
-            queen.style.bottom = `${col * 50}px`; // Posição vertical
-            queen.style.left = `${visualRow * 50}px`; // Posição horizontal (coluna correta)
+            // Atualiza as posições das rainhas no tabuleiro
+            for (let row = 0; row < solution.length; row++) {
+                const col = solution[row]; // Coluna da rainha para a linha atual
+                const queen = document.createElement('div');
+                queen.className = 'queen';
 
-            board.appendChild(queen);
+                // Inverte as linhas para exibição de baixo para cima
+                const visualRow = row;
+                queen.style.bottom = `${col * 50}px`; // Posição vertical
+                queen.style.left = `${visualRow * 50}px`; // Posição horizontal (coluna correta)
+
+                board.appendChild(queen);
+            }
         }
-    }
 
-    // Função para exibir a solução na tabela
-    function exibirSolucao(solution) {
-        const solutionTable = document.getElementById('solution-table');
-        solutionTable.innerHTML = '';
+        // Função para exibir a solução na tabela
+        function exibirSolucao(solution) {
+            const solutionTable = document.getElementById('solution-table');
+            solutionTable.innerHTML = '';
 
-        // Cabeçalho (colunas A a H)
-        const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-        columns.forEach(col => {
-            const cell = document.createElement('div');
-            cell.textContent = col;
-            cell.style.fontWeight = 'bold';
-            solutionTable.appendChild(cell);
-        });
+            // Cabeçalho (colunas A a H)
+            const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            columns.forEach(col => {
+                const cell = document.createElement('div');
+                cell.textContent = col;
+                cell.style.fontWeight = 'bold';
+                solutionTable.appendChild(cell);
+            });
 
-        // Solução (exibição das colunas de cada linha)
-        solution.forEach(num => {
-            const cell = document.createElement('div');
-            cell.textContent = num + 1; // Converte índice 0-7 para exibição 1-8
-            solutionTable.appendChild(cell);
-        });
-    }
+            // Solução (exibição das colunas de cada linha)
+            solution.forEach(num => {
+                const cell = document.createElement('div');
+                cell.textContent = num + 1; // Converte índice 0-7 para exibição 1-8
+                solutionTable.appendChild(cell);
+            });
+        }
     </script>
 </head>
 <body>
     <h1 style="text-align: center;">Problema das 8 Rainhas</h1>
+    <label for="algorithm">Algoritmo:</label>
+    <select id="algorithm">
+        <option value="dfs">Busca em Profundidade (DFS)</option>
+        <option value="hill_climbing">Subida de Encosta (Hill Climbing)</option>
+    </select>
     <div class="container">
         <div class="content">
             <!-- Tabuleiro e rótulos -->
