@@ -1,37 +1,35 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .utils import solve_n_queens, solve_n_queens_hill_climbing
+from .utils import resolver_n_rainhas_dfs, resolver_n_rainhas_subida_encosta
 
-# Armazena soluções na memória (simples)
-solutions = solve_n_queens()
-current_solution_index = 0
+# Índice da solução atual (para controle da navegação)
+indice_solucao_atual = 0
 
-def tabuleiro_view(request):
-    global current_solution_index
-    current_solution_index = 0  # Reinicia no início
+def exibir_tabuleiro(request):
+    """Renderiza a página inicial do tabuleiro."""
+    global indice_solucao_atual
+    indice_solucao_atual = 0  # Reinicia para a primeira solução
     return render(request, 'tabuleiro.html')
 
 def iniciar_busca(request):
-    global solutions, current_solution_index
-    algoritmo = request.GET.get('algoritmo', 'dfs')  # Pega o parâmetro correto enviado pelo front-end
-    
-    if algoritmo == 'dfs':
-        solutions, exec_time = solve_n_queens()  # Chama o DFS com medição de tempo
-    elif algoritmo == 'hill_climbing':
-        solutions, exec_time = solve_n_queens_hill_climbing()  # Chama o Hill Climbing com medição de tempo
-    else:
-        return JsonResponse({'error': 'Algoritmo inválido'}, status=400)  # Erro para valores inválidos
-    
-    current_solution_index = 0
-    return JsonResponse({'solution': solutions[current_solution_index], 'time': exec_time})
+    """Inicia a busca de soluções com o algoritmo escolhido."""
+    global solucoes, indice_solucao_atual
+    algoritmo = request.GET.get('algoritmo', 'dfs')  # Obtém o parâmetro 'algoritmo' enviado pelo front-end
 
+    if algoritmo == 'dfs':
+        solucoes, tempo_execucao = resolver_n_rainhas_dfs()  # Executa busca em profundidade
+    elif algoritmo == 'hill_climbing':
+        solucoes, tempo_execucao = resolver_n_rainhas_subida_encosta()  # Executa subida de encosta
+    else:
+        return JsonResponse({'erro': 'Algoritmo inválido'}, status=400)  # Retorna erro se o algoritmo não for reconhecido
+
+    indice_solucao_atual = 0
+    return JsonResponse({'solucao': solucoes[indice_solucao_atual], 'tempo': tempo_execucao})
 
 def proxima_solucao(request):
-    global solutions, current_solution_index
-    current_solution_index += 1
-    if current_solution_index >= len(solutions):
-        current_solution_index = 0  # Reinicia ao atingir o final
-    return JsonResponse({'solution': solutions[current_solution_index]})
-
-#calcula o tempo de busca
-
+    """Avança para a próxima solução."""
+    global solucoes, indice_solucao_atual
+    indice_solucao_atual += 1
+    if indice_solucao_atual >= len(solucoes):
+        indice_solucao_atual = 0  # Reinicia para a primeira solução se atingir o final
+    return JsonResponse({'solucao': solucoes[indice_solucao_atual]})
